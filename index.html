@@ -13,10 +13,14 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
-        /* 2. Video Styling */
+        /* 2. Video Styling - Changed to 'contain' to prevent cropping */
         video { 
-            width: 100vw; height: 100vh; object-fit: cover; 
-            display: block; background: #000; outline: none;
+            width: 100vw; 
+            height: 100vh; 
+            object-fit: contain; /* Shows the whole video, no cropping */
+            display: block; 
+            background: #000; 
+            outline: none;
         }
 
         /* 3. Loading Overlay */
@@ -42,10 +46,10 @@
         #start-btn {
             display: none; 
             padding: 15px 40px; 
-            background: #d1d5db; /* Light Grey */
-            color: #000000;      /* Black Text */
+            background: #d1d5db; 
+            color: #000000;      
             border: none; 
-            border-radius: 8px;  /* Changed from 50px to 8px for rectangular shape */
+            border-radius: 8px;  
             font-weight: normal; 
             cursor: pointer; 
             font-size: 1.2rem; 
@@ -57,10 +61,10 @@
 
         #start-btn:active {
             transform: scale(0.95);
-            background: #9ca3af; /* Darker grey when clicked */
+            background: #9ca3af;
         }
 
-        /* 5. Progress Bar - Kept Purple for theme consistency */
+        /* 5. Progress Bar */
         #progress-container { 
             width: 200px; height: 4px; background: #222; 
             border-radius: 2px; margin-top: 20px; overflow: hidden; 
@@ -117,7 +121,7 @@
         const timer = setInterval(() => {
             count--;
             let progress = ((totalTime - count) / totalTime) * 100;
-            progressBar.style.width = progress + "%";
+            if(progressBar) progressBar.style.width = progress + "%";
 
             if (count > 0) {
                 countdownEl.innerText = count;
