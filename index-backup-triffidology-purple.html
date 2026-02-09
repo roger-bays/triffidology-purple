@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Triffidology Purple</title>
+    <style>
+        /* 1. Reset and Full Screen Layout */
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            background-color: #000; overflow: hidden; 
+            display: flex; align-items: center; justify-content: center;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        /* 2. Video Styling - Ensures no gaps or borders */
+        video { 
+            width: 100vw; height: 100vh; object-fit: contain; 
+            display: block; background: #000; outline: none;
+        }
+
+        /* 3. Loading Overlay */
+        #loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; z-index: 100;
+            transition: opacity 0.8s ease;
+        }
+
+        #countdown {
+            font-size: 5rem; font-weight: 800; color: #a855f7;
+            text-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+            margin: 10px 0;
+        }
+
+        .loading-text { 
+            font-size: 1rem; letter-spacing: 3px; 
+            text-transform: uppercase; color: #fff; opacity: 0.8; 
+        }
+
+        /* 4. Progress Bar */
+        #progress-container { 
+            width: 200px; height: 4px; background: #222; 
+            border-radius: 2px; margin-top: 20px; overflow: hidden; 
+        }
+        #progress-bar { 
+            width: 0%; height: 100%; background: #a855f7; 
+            box-shadow: 0 0 10px #a855f7; transition: width 1s linear; 
+        }
+
+        /* iOS height fix */
+        @supports (-webkit-touch-callout: none) {
+            body { height: -webkit-fill-available; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loader">
+        <div class="loading-text" id="status-msg">Initialising</div>
+        <div id="countdown">10</div>
+        <div id="progress-container">
+            <div id="progress-bar"></div>
+        </div>
+    </div>
+
+    <video id="myVideo" autoplay loop muted playsinline preload="auto">
+        <source src="triffidology-purple.mp4" type="video/mp4">
+    </video>
+
+    <script>
+        const video = document.getElementById('myVideo');
+        const loader = document.getElementById('loader');
+        const countdownEl = document.getElementById('countdown');
+        const progressBar = document.getElementById('progress-bar');
+        const statusMsg = document.getElementById('status-msg');
+
+        let count = 10;
+        const totalTime = 10;
+
+        // Force browser to start downloading the video immediately
+        video.load();
+
+        // 1. Countdown and Progress Bar Logic
+        const timer = setInterval(() => {
+            count--;
+            
+            // Move progress bar smoothly
+            let progress = ((totalTime - count) / totalTime) * 100;
+            progressBar.style.width = progress + "%";
+
+            if (count > 0) {
+                countdownEl.innerText = count;
+            } else {
+                clearInterval(timer);
+                finalAttempt();
+            }
+        }, 1000);
+
+        // 2. Final Check: Start Video and Hide Loader
+        function finalAttempt() {
+            statusMsg.innerText = "Launching...";
+            
+            // Try to play the video
+            video.play().then(() => {
+                exitLoader();
+            }).catch(err => {
+                // If it fails (due to buffering), give it 2 more seconds then force it
+                console.warn("Video still buffering, forcing display shortly...");
+                setTimeout(exitLoader, 2000); 
+            });
+        }
+
+        function exitLoader() {
+            loader.style.opacity = '0';
+            setTimeout(() => { 
+                loader.style.display = 'none'; 
+            }, 800);
+        }
+
+        // 3. Gapless Loop Backup - ensures no black frames between loops
+        video.addEventListener('ended', () => { 
+            video.play(); 
+        });
+    </script>
+</body>
+</html>

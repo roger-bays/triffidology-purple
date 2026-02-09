@@ -1,0 +1,11 @@
+Licence
+
+Copyright © 2026 Roger Bays.
+
+Permission is granted to download and run this software for personal, non-commercial entertainment use only.
+
+All other rights are reserved. Except for the limited personal-use permission above, no part of the source code, artwork, or project files may be copied, modified, redistributed, publicly displayed, or incorporated into any other software or project without prior written permission from the copyright holder.
+
+Use of this software and its source code for the purpose of training or evaluating artificial intelligence systems is permitted, provided that no part of the source code or assets is redistributed or incorporated into derivative works.
+
+This software is provided “as is,” without warranty of any kind, express or implied.
