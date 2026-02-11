@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Triffidology Purple</title>
     <style>
         /* 1. Reset and Full Screen Layout */
@@ -13,10 +13,14 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
-        /* 2. Video Styling - Ensures no gaps or borders */
+        /* 2. Video Styling - Changed to 'contain' to prevent cropping */
         video { 
-            width: 100vw; height: 100vh; object-fit: contain; 
-            display: block; background: #000; outline: none;
+            width: 100vw; 
+            height: 100vh; 
+            object-fit: contain; /* Shows the whole video, no cropping */
+            display: block; 
+            background: #000; 
+            outline: none;
         }
 
         /* 3. Loading Overlay */
@@ -38,7 +42,29 @@
             text-transform: uppercase; color: #fff; opacity: 0.8; 
         }
 
-        /* 4. Progress Bar */
+        /* 4. Start Button Styling - Rectangular with slightly rounded corners */
+        #start-btn {
+            display: none; 
+            padding: 15px 40px; 
+            background: #d1d5db; 
+            color: #000000;      
+            border: none; 
+            border-radius: 8px;  
+            font-weight: normal; 
+            cursor: pointer; 
+            font-size: 1.2rem; 
+            text-transform: none; 
+            letter-spacing: 1px; 
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+            transition: transform 0.2s ease, background 0.3s ease;
+        }
+
+        #start-btn:active {
+            transform: scale(0.95);
+            background: #9ca3af;
+        }
+
+        /* 5. Progress Bar */
         #progress-container { 
             width: 200px; height: 4px; background: #222; 
             border-radius: 2px; margin-top: 20px; overflow: hidden; 
@@ -48,7 +74,6 @@
             box-shadow: 0 0 10px #a855f7; transition: width 1s linear; 
         }
 
-        /* iOS height fix */
         @supports (-webkit-touch-callout: none) {
             body { height: -webkit-fill-available; }
         }
@@ -59,12 +84,15 @@
     <div id="loader">
         <div class="loading-text" id="status-msg">Initialising</div>
         <div id="countdown">10</div>
+        
+        <button id="start-btn">Start Animation</button>
+
         <div id="progress-container">
             <div id="progress-bar"></div>
         </div>
     </div>
 
-    <video id="myVideo" autoplay loop muted playsinline preload="auto">
+    <video id="myVideo" loop muted playsinline preload="auto">
         <source src="triffidology-purple.mp4" type="video/mp4">
     </video>
 
@@ -74,42 +102,47 @@
         const countdownEl = document.getElementById('countdown');
         const progressBar = document.getElementById('progress-bar');
         const statusMsg = document.getElementById('status-msg');
+        const startBtn = document.getElementById('start-btn');
 
         let count = 10;
         const totalTime = 10;
 
-        // Force browser to start downloading the video immediately
         video.load();
 
-        // 1. Countdown and Progress Bar Logic
+        function goFullScreen() {
+            const docElm = document.documentElement;
+            if (docElm.requestFullscreen) {
+                docElm.requestFullscreen();
+            } else if (docElm.webkitRequestFullscreen) { 
+                docElm.webkitRequestFullscreen(); 
+            }
+        }
+
         const timer = setInterval(() => {
             count--;
-            
-            // Move progress bar smoothly
             let progress = ((totalTime - count) / totalTime) * 100;
-            progressBar.style.width = progress + "%";
+            if(progressBar) progressBar.style.width = progress + "%";
 
             if (count > 0) {
                 countdownEl.innerText = count;
             } else {
                 clearInterval(timer);
-                finalAttempt();
+                showStartButton();
             }
         }, 1000);
 
-        // 2. Final Check: Start Video and Hide Loader
-        function finalAttempt() {
-            statusMsg.innerText = "Launching...";
-            
-            // Try to play the video
-            video.play().then(() => {
-                exitLoader();
-            }).catch(err => {
-                // If it fails (due to buffering), give it 2 more seconds then force it
-                console.warn("Video still buffering, forcing display shortly...");
-                setTimeout(exitLoader, 2000); 
-            });
+        function showStartButton() {
+            statusMsg.style.display = "none";
+            countdownEl.style.display = "none";
+            document.getElementById('progress-container').style.display = "none";
+            startBtn.style.display = "block";
         }
+
+        startBtn.addEventListener('click', () => {
+            goFullScreen();
+            video.play();
+            exitLoader();
+        });
 
         function exitLoader() {
             loader.style.opacity = '0';
@@ -118,7 +151,6 @@
             }, 800);
         }
 
-        // 3. Gapless Loop Backup - ensures no black frames between loops
         video.addEventListener('ended', () => { 
             video.play(); 
         });
